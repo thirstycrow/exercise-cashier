@@ -48,6 +48,10 @@ class Cashier(repo: Repository, printer: BillingPrinter, title: Option[String] =
           Item(repo.getProductByCode(code), BigDecimal.valueOf(1))
       })
   }
+
+  def printBilling(json: String): Unit = {
+    printBilling(parse(json))
+  }
 }
 
 trait Repository {

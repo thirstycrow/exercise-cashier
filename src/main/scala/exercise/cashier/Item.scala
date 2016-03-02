@@ -4,8 +4,6 @@ import java.io.PrintWriter
 
 object Item {
 
-  val separator = '，'
-
   def apply(product: Product, quantity: BigDecimal) = {
     new Item(product, quantity, (quantity * BigDecimal(product.unitPrice)).intValue(), 0, None)
   }
