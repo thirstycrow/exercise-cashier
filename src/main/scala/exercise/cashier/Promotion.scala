@@ -20,13 +20,24 @@ trait Promotion {
   def apply(item: Item): Item
 }
 
+trait PrintInline
+
+trait PrintAppliedItems {
+  def printItem(item: Item, printer: BillingPrinter) = {
+    printer.printName(item.product.name)
+      .separator().printQuantity(item.saved / item.product.unitPrice, item.product.unit)
+      .println()
+  }
+}
+
 case class ExtraForFree(
   id: Int,
   priority: Int,
   name: String,
   minimum: Int,
   extra: Int)
-    extends Promotion {
+    extends Promotion
+    with PrintAppliedItems {
 
   def apply(item: Item): Item = {
     if (item.quantity > minimum) {
@@ -36,7 +47,7 @@ case class ExtraForFree(
       item.copy(
         amount = item.amount - saved,
         saved = item.saved + saved,
-        promotion = this :: item.promotion)
+        promotion = Some(this))
     } else {
       item
     }
@@ -48,14 +59,15 @@ case class Discount(
   priority: Int,
   name: String,
   percentage: Int)
-    extends Promotion {
+    extends Promotion
+    with PrintInline {
 
   def apply(item: Item): Item = {
     val amount = item.amount * percentage / 100
     item.copy(
       amount = amount,
       saved = item.amount - amount,
-      promotion = this :: item.promotion
+      promotion = Some(this)
     )
   }
 }
