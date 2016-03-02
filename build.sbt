@@ -1,0 +1,4 @@
+organization := "exercise"
+
+name := "cashier"
+
