@@ -1,5 +1,14 @@
 package exercise.cashier
 
+object Promotion {
+
+  implicit val byPriority = new Ordering[Promotion] {
+    def compare(a: Promotion, b: Promotion): Int = {
+      a.priority - b.priority
+    }
+  }
+}
+
 trait Promotion {
 
   def id: Int
