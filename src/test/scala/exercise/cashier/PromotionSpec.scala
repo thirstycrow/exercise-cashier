@@ -8,9 +8,11 @@ class PromotionSpec extends FlatSpec with Matchers {
   val dummyProduct = Product("ITEM_DUMMY", "DUMMY", "个", 100)
 
   it should "get extra for free" in {
-    val promo = ExtraForFree(1, 1, "买二送一", 2, 1)
-    promo(Item(dummyProduct, 3)) shouldBe Item(dummyProduct, 3, 200, 100, List(promo))
-    promo(Item(dummyProduct, 6)) shouldBe Item(dummyProduct, 6, 500, 100, List(promo))
+    val promo = ExtraForFree(1, 1, "买三送二", 3, 2)
+    promo(Item(dummyProduct, 4)) shouldBe Item(dummyProduct, 4, 300, 100, List(promo))
+    promo(Item(dummyProduct, 5)) shouldBe Item(dummyProduct, 5, 300, 200, List(promo))
+    promo(Item(dummyProduct, 6)) shouldBe Item(dummyProduct, 6, 400, 200, List(promo))
+    promo(Item(dummyProduct, 7)) shouldBe Item(dummyProduct, 7, 500, 200, List(promo))
   }
 
   it should "not get extra for free if not bought enough" in {

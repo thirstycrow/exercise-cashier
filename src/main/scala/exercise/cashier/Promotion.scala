@@ -29,8 +29,8 @@ case class ExtraForFree(
     extends Promotion {
 
   def apply(item: Item): Item = {
-    if (item.quantity >= minimum + extra) {
-      val saved = item.product.unitPrice * extra
+    if (item.quantity > minimum) {
+      val saved = item.product.unitPrice * Math.min(extra, item.quantity - minimum)
       item.copy(
         amount = item.amount - saved,
         saved = item.saved + saved,
