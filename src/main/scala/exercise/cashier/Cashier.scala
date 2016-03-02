@@ -87,7 +87,7 @@ trait BillingPrinter {
 
   def printName(name: String) = print("名称：").print(name)
 
-  def printQuantity(quantity: Int, unit: String) = print("数量：").print(quantity).print(unit)
+  def printQuantity(quantity: BigDecimal, unit: String) = print("数量：").print(quantity).print(unit)
 
   def printItems(items: Iterable[Item]) = {
     items.foreach(printItem)
