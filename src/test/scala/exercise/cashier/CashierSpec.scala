@@ -8,14 +8,15 @@ import java.io.PrintWriter
 class CashierSpec extends FlatSpec with Matchers {
 
   val cola = Product("ITEM000001", "可口可乐", "瓶", 300)
-  val baminton = Product("ITEM000002", "羽毛球", "个", 100)
+  val baminton = Product("ITEM000005", "羽毛球", "个", 100)
   val apple = Product("ITEM000003", "苹果", "斤", 550)
+  val products = List(cola, baminton, apple).map(p => p.barcode -> p).toMap
 
   val extraForFree = ExtraForFree(1, 1, "买二赠一", 2, 1)
   val discount95 = Discount(2, 2, "95折", 95)
 
   it should "aggregate items by product" in {
-    val cashier = new Cashier(null, new TestBillingPrinter);
+    val cashier = new Cashier(null, new TestBillingPrinter)
     val items = Seq(
       Item(cola, 1),
       Item(baminton, 1),
@@ -38,10 +39,37 @@ class CashierSpec extends FlatSpec with Matchers {
   it should "apply promotion properly" in {
     val cashier = new Cashier(new TestRepository {
       override def promotionsForProduct(product: Product) = Seq(extraForFree, discount95)
-    }, new TestBillingPrinter);
+    }, new TestBillingPrinter)
     cashier.applyPromotion(Item(cola, 1)) shouldBe Item(cola, 1, 285, 15, Some(discount95))
     cashier.applyPromotion(Item(cola, 2)) shouldBe Item(cola, 2, 570, 30, Some(discount95))
     cashier.applyPromotion(Item(cola, 3)) shouldBe Item(cola, 3, 600, 300, Some(extraForFree))
+  }
+
+  it should "parse input json" in {
+    val cashier = new Cashier(new TestRepository {
+      override def promotionsForProduct(product: Product) = Seq(extraForFree, discount95)
+    }, new TestBillingPrinter)
+    cashier.parse("""[
+        "ITEM000001",
+        "ITEM000001",
+        "ITEM000001",
+        "ITEM000001",
+        "ITEM000001",
+        "ITEM000003-2",
+        "ITEM000005",
+        "ITEM000005",
+        "ITEM000005"
+      ]""").toSet shouldBe Set(
+      Item(cola, 1),
+      Item(cola, 1),
+      Item(cola, 1),
+      Item(cola, 1),
+      Item(cola, 1),
+      Item(apple, 2),
+      Item(baminton, 1),
+      Item(baminton, 1),
+      Item(baminton, 1)
+    )
   }
 
   it should "print billing" in {
@@ -117,13 +145,14 @@ class CashierSpec extends FlatSpec with Matchers {
     cashier.printBilling(items)
     printer.getBilling shouldBe expected
   }
-}
 
-class TestRepository extends Repository {
-  def addProduct(product: Product): Unit = ???
-  def addProductForPromotion(promotion: Promotion, product: Product): Unit = ???
-  def addPromotion(promotion: Promotion): Unit = ???
-  def promotionsForProduct(product: Product): Seq[Promotion] = ???
+  class TestRepository extends Repository {
+    def addProduct(product: Product): Unit = ???
+    def addProductForPromotion(promotion: Promotion, product: Product): Unit = ???
+    def addPromotion(promotion: Promotion): Unit = ???
+    def promotionsForProduct(product: Product): Seq[Promotion] = ???
+    def getProductByCode(code: String) = products(code)
+  }
 }
 
 class TestBillingPrinter extends BillingPrinter {

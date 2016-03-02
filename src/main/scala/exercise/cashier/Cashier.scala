@@ -1,9 +1,13 @@
 package exercise.cashier
 
-import scala.collection.mutable
-import java.io.PrintWriter
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 
 class Cashier(repo: Repository, printer: BillingPrinter, title: Option[String] = None) {
+
+  private val mapper = new ObjectMapper with ScalaObjectMapper
+  mapper.registerModule(DefaultScalaModule)
 
   def aggregateByProduct(items: Seq[Item]): Iterable[Item] = {
     val summedItems = items.foldLeft(Map[Product, Item]()) { (m, i) =>
@@ -34,6 +38,16 @@ class Cashier(repo: Repository, printer: BillingPrinter, title: Option[String] =
       .printTotal(billingItems)
       .endOfBilling()
   }
+
+  def parse(json: String): Seq[Item] = {
+    mapper.readValue[Seq[String]](json)
+      .map(_.split("-") match {
+        case Array(code, quantity) =>
+          Item(repo.getProductByCode(code), BigDecimal(quantity))
+        case Array(code) =>
+          Item(repo.getProductByCode(code), BigDecimal.valueOf(1))
+      })
+  }
 }
 
 trait Repository {
@@ -62,6 +76,8 @@ trait Repository {
    * @param product
    */
   def promotionsForProduct(product: Product): Seq[Promotion]
+
+  def getProductByCode(code: String): Product
 }
 
 trait BillingPrinter {
