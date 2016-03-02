@@ -13,6 +13,9 @@ class PromotionSpec extends FlatSpec with Matchers {
     promo(Item(dummyProduct, 5)) shouldBe Item(dummyProduct, 5, 300, 200, List(promo))
     promo(Item(dummyProduct, 6)) shouldBe Item(dummyProduct, 6, 400, 200, List(promo))
     promo(Item(dummyProduct, 7)) shouldBe Item(dummyProduct, 7, 500, 200, List(promo))
+    promo(Item(dummyProduct, 8)) shouldBe Item(dummyProduct, 8, 600, 200, List(promo))
+    promo(Item(dummyProduct, 9)) shouldBe Item(dummyProduct, 9, 600, 300, List(promo))
+    promo(Item(dummyProduct, 10)) shouldBe Item(dummyProduct, 10, 600, 400, List(promo))
   }
 
   it should "not get extra for free if not bought enough" in {

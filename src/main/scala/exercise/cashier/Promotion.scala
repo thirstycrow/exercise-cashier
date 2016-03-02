@@ -30,7 +30,9 @@ case class ExtraForFree(
 
   def apply(item: Item): Item = {
     if (item.quantity > minimum) {
-      val saved = item.product.unitPrice * Math.min(extra, item.quantity - minimum)
+      val sum = minimum + extra
+      val freeQuantity = item.quantity / sum * extra + Math.max(item.quantity % sum - minimum, 0)
+      val saved = item.product.unitPrice * freeQuantity
       item.copy(
         amount = item.amount - saved,
         saved = item.saved + saved,
